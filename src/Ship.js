@@ -27,10 +27,12 @@ export default function Ship(type) {
 
   let hits = 0;
   const hit = () => hits++;
-  const isSunk = () => hits == size;
+  const isSunk = () => hits >= size;
   const getName = () => name;
+  const getSize = () => size;
 
   return {
+    getSize,
     getName,
     hit,
     isSunk,
