@@ -1,8 +1,14 @@
 import Ship from "./Ship";
-import { useState } from "react";
+import {
+  isARealCell,
+  isIn,
+  isOccupied,
+  isValidDir,
+} from "./helpers";
 
 export default function Gameboard() {
   let shipsAfloat = [];
+  let shipSunk = [];
   let occupiedCells = [];
   let missed = [];
   let hit = [];
@@ -10,39 +16,10 @@ export default function Gameboard() {
     return missed.concat(hit);
   };
 
-  const isARealCell = (array) => {
-    return (
-      typeof array == "object" &&
-      array.length == 2 &&
-      array[0].length == 1 &&
-      typeof array[0] == "string" &&
-      Number.isInteger(array[1]) &&
-      array[0] >= "A" &&
-      array[0] <= "J" &&
-      array[1] >= 1 &&
-      array[1] <= 10
-    );
-  };
-
-  const areMatching = (a, b) => {
-    return a[0] == b[0] && a[1] == b[1];
-  };
-
-  const isIn = (targetCell, array) => {
-    return array.some((cell) => areMatching(targetCell, cell));
-  };
-  const isOccupied = (cell) => {
-    return isIn(cell, occupiedCells);
-  };
-
   const freeCells = (cells) => {
     occupiedCells = occupiedCells.filter(
       (occupiedCell) => !isIn(occupiedCell, cells)
     );
-  };
-
-  const isValidDir = (dir) => {
-    return dir === "vertical" || dir === "horizontal";
   };
 
   const place = (ship, cell, dir) => {
@@ -60,7 +37,7 @@ export default function Gameboard() {
     let a = null;
     let b = null;
 
-    if (dir === "vertical") {
+    if (dir === "v") {
       a = 1;
       b = 0;
     } else {
@@ -76,46 +53,53 @@ export default function Gameboard() {
         : (celltoAdd[a] = cell[a] + index);
       celltoAdd[b] = cell[b];
       cells.push(celltoAdd);
-      if (!isARealCell(celltoAdd) || isOccupied(celltoAdd))
+      if (!isARealCell(celltoAdd) || isOccupied(celltoAdd, occupiedCells))
         throw new Error(`Your ${ship.getName()} cannot be placed here`);
     }
     occupiedCells = occupiedCells.concat(cells);
-
-    let Newship = {
+    
+    let newShip = {
       ...ship,
       coordinates: cells,
     };
+
     //put the ship afloat
-    shipsAfloat.push(Newship);
-    return Newship;
+    shipsAfloat.push(newShip);
+    return newShip;
   };
-
+  
   const receiveAttack = (cell) => {
-    if (!isARealCell(cell)) throw new Error("This cell does not exist");
 
+    let msg='';
+    if (!isARealCell(cell)) throw new Error("This cell does not exist");
+    
     // record the location as attacked;
     if (isIn(cell, attackedLocations())) {
       throw new Error("This cell has already been attacked");
     }
-    //if cell is occupied find by which ship and hit him return the ship
-    if (isOccupied(cell)) {
+    //if cell is occupied find by which ship and hit him return hit or ocean if is sunk
+    if (isOccupied(cell, occupiedCells)) {
       shipsAfloat.map((ship) => {
-        if (isIn(cell, ship.coordinates)) ship.hit();
-        hit.push(cell);
-        return ship;
+        if (isIn(cell, ship.coordinates)) {
+          ship.hit();
+          hit.push(cell);
+          msg = ship.isSunk() ? ship.getName(): "hit";
+          shipSunk.push()
+        } 
       });
+   
+      //else retunr missed
     } else {
       missed.push(cell);
-      return false;
+      msg = "missed";
     }
-    //else return false
+       return msg;
   };
 
   const getMissed = () => {
     return missed;
   };
   const allSunk = () => {
-    //console.log(shipsAfloat.map((ship)=> ship.isSunk()));
     return shipsAfloat.every((ship)=>ship.isSunk());
   };
   return {
@@ -123,5 +107,6 @@ export default function Gameboard() {
     receiveAttack,
     getMissed,
     allSunk,
+    attackedLocations,
   };
 }

@@ -10,49 +10,40 @@ let patrolBoat = Ship(5);
 
 test("can place a ship", () => {
   let gameboard = Gameboard();
-  expect(gameboard.place(Ship(1), ["A", 3], "vertical")).toBeDefined();
+  expect(gameboard.place(Ship(1), ["A", 3], "v")).toBeDefined();
 });
 
 //coordinates check
 test("throws when coordinates origin are invalid", () => {
   let gameboard = Gameboard();
   expect(() => {
-    gameboard.place(carrier, ["Jack", 3], "vertical");
+    gameboard.place(carrier, ["Jack", 3], "v");
   }).toThrow("Coordinates");
 
   expect(() => {
-    gameboard.place(battleship, ["B", 3.3], "vertical");
+    gameboard.place(battleship, ["B", 3.3], "v");
   }).toThrow("Coordinates");
   expect(() => {
-    gameboard.place(carrier, [5, "E"], "vertical");
+    gameboard.place(carrier, [5, "E"], "v");
   }).toThrow("Coordinates");
 });
 
 test("throws when coordinates origin  of is out of the grid", () => {
   let gameboard = Gameboard();
   expect(() => {
-    gameboard.place(destroyer, ["V", 2], "horizontal");
+    gameboard.place(destroyer, ["V", 2], "h");
   }).toThrow("Coordinates");
   expect(() => {
-    gameboard.place(submarine, ["B", 13], "vertical");
+    gameboard.place(submarine, ["B", 13], "v");
   }).toThrow("Coordinates");
 });
 
-test("throws when coordinates origin  of is out of the grid", () => {
-  let gameboard = Gameboard();
-  expect(() => {
-    gameboard.place(patrolBoat, ["V", 2], "horizontal");
-  }).toThrow("Coordinates");
-  expect(() => {
-    gameboard.place(battleship, ["B", 13], "vertical");
-  }).toThrow("Coordinates");
-});
 
 // direction check
 test("throws when direction is invalid or absent", () => {
   let gameboard = Gameboard();
   expect(() => {
-    gameboard.place(destroyer, ["F", 9], "h");
+    gameboard.place(destroyer, ["F", 9], "g");
   }).toThrow("Direction");
   expect(() => {
     gameboard.place(patrolBoat, ["F", 9]);
@@ -61,7 +52,7 @@ test("throws when direction is invalid or absent", () => {
 
 test("returns an array of valid cells", () => {
   let gameboard = Gameboard();
-  expect(gameboard.place(submarine, ["A", 3], "horizontal")).toEqual({
+  expect(gameboard.place(submarine, ["A", 3], "h")).toEqual({
     ...submarine,
     coordinates: [
       ["A", 3],
@@ -74,38 +65,38 @@ test("returns an array of valid cells", () => {
 test("throws an error when the ship cannot fit the grid", () => {
   let gameboard = Gameboard();
   expect(() => {
-    gameboard.place(destroyer, ["F", 9], "vertical");
+    gameboard.place(destroyer, ["F", 9], "v");
   }).toThrow("placed");
   expect(() => {
-    gameboard.place(carrier, ["G", 7], "horizontal");
+    gameboard.place(carrier, ["G", 7], "h");
   }).toThrow("placed");
 });
 
 test("throws an error when the ship is placed on another ship", () => {
   let gameboard = Gameboard();
-  expect(gameboard.place(battleship, ["E", 4], "horizontal")).toBeDefined();
+  expect(gameboard.place(battleship, ["E", 4], "h")).toBeDefined();
   expect(() => {
-    gameboard.place(patrolBoat, ["G", 3], "vertical");
+    gameboard.place(patrolBoat, ["G", 3], "v");
   }).toThrow("placed");
 
   let gameboard2 = Gameboard();
-  expect(gameboard2.place(patrolBoat, ["G", 3], "vertical")).toBeDefined();
+  expect(gameboard2.place(patrolBoat, ["G", 3], "v")).toBeDefined();
   expect(() => {
-    gameboard2.place(battleship, ["E", 4], "horizontal");
+    gameboard2.place(battleship, ["E", 4], "h");
   }).toThrow("placed");
 });
 
 test("can replace ship", () => {
   let gameboard = Gameboard();
-  carrier = gameboard.place(carrier, ["G", 3], "vertical");
+  carrier = gameboard.place(carrier, ["G", 3], "v");
   expect(() => {
-    carrier = gameboard.place(carrier, ["G", 4], "vertical");
+    carrier = gameboard.place(carrier, ["G", 4], "v");
   }).not.toThrow();
 });
 
 test("can receive an attack", () => {
   let gameboard = Gameboard();
-  carrier = gameboard.place(carrier, ["G", 3], "vertical");
+  carrier = gameboard.place(carrier, ["G", 3], "v");
 //hit every coordinates of carrier
   carrier.coordinates.map((cell) => {
     gameboard.receiveAttack(cell);
@@ -116,7 +107,7 @@ test("can receive an attack", () => {
 
 test("cannot receive attack in the same cell twice", () => {
   let gameboard = Gameboard();
-  carrier = gameboard.place(carrier, ["B", 3], "vertical");
+  carrier = gameboard.place(carrier, ["B", 3], "v");
 
   gameboard.receiveAttack(["G", 4]);
   gameboard.receiveAttack(["B", 3]);
@@ -135,7 +126,7 @@ test("cannot receive attack in the same cell twice", () => {
 
 test("keep track of missed attacks", () => {
   let gameboard = Gameboard();
-  carrier = gameboard.place(carrier, ["G", 3], "vertical");
+  carrier = gameboard.place(carrier, ["G", 3], "v");
   gameboard.receiveAttack(["G", 2]);
   gameboard.receiveAttack(["G", 4]);
   gameboard.receiveAttack(["A", 9]);
@@ -145,8 +136,8 @@ test("keep track of missed attacks", () => {
 
 test("reports whether or not all of their ships have been sunk",() => {
   let gameboard = Gameboard();
-  patrolBoat = gameboard.place(patrolBoat, ["C", 7], "horizontal");
-  submarine = gameboard.place(submarine, ["H", 2], "vertical");
+  patrolBoat = gameboard.place(patrolBoat, ["C", 7], "h");
+  submarine = gameboard.place(submarine, ["H", 2], "v");
 
   //sink submarine
   submarine.coordinates.map((cell) => {
