@@ -25,7 +25,7 @@ function Grid({handleClick}){
 function MiniGrid(){
     return (
       <>
-        <h3>Your ships :</h3>
+        <h2>Your ships</h2>
         <div className="grid">
           {grid.map((cell) => {
              let id = "my-" + cell.toString();

@@ -46,37 +46,63 @@ function App() {
       messageBoard.innerHTML = msg;
     } else {
       let ripost = cpu.autoAttack(humanBoard);
-      console.info(ripost);
+      msg = ripost.msg;
+      messageBoard.innerHTML = msg;
+      console.info(ripost.cell);
     }
   };
 
   return (
     <>
-      <header>
+      <div className="left">
         <div className="title">
           <h1>Battleship</h1>
-          <p>This a game of war.</p>
+          <p>This is a game of war!</p>
         </div>
-        <Grid handleClick={handleClick}></Grid>
-        <div className="scoreBoard">
-          <p id="carrier">
+        <div className="scoreBoard target">
+          <h2>Targets</h2>
+          <div className="score">
+            <h3 id="carrier">
+              Carrier(5) : <span>Afloat</span>
+            </h3>
+            <h3 id="battleship">
+              Battleship(4) : <span>Afloat</span>
+            </h3>
+            <h3 id="destroyer">
+              Destroyer(3) : <span>Afloat</span>
+            </h3>
+            <h3 id="submarine">
+              Submarine(3) : <span>Afloat</span>
+            </h3>
+            <h3 id="patrol">
+              Patrol Boat(2) : <span>Afloat</span>
+            </h3>
+          </div>
+        </div>
+      </div>
+      <Grid handleClick={handleClick}></Grid>
+      <div className="scoreBoard player">
+        <div className="title">
+        <MiniGrid />
+      </div>
+        <div className="score">
+          <h3 id="carrier">
             Carrier(5) : <span>Afloat</span>
-          </p>
-          <p id="battleship">
+          </h3>
+          <h3 id="battleship">
             Battleship(4) : <span>Afloat</span>
-          </p>
-          <p id="destroyer">
+          </h3>
+          <h3 id="destroyer">
             Destroyer(3) : <span>Afloat</span>
-          </p>
-          <p id="submarine">
+          </h3>
+          <h3 id="submarine">
             Submarine(3) : <span>Afloat</span>
-          </p>
-          <p id="patrol">
+          </h3>
+          <h3 id="patrol">
             Patrol Boat(2) : <span>Afloat</span>
-          </p>
-          <MiniGrid />
+          </h3>
         </div>
-      </header>
+      </div>
     </>
   );
 }
