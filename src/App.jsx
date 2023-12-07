@@ -12,6 +12,7 @@ function App() {
   const [msg, setMsg] = useState("Player 1: Choose wisely");
   const [overlay, setOverlay] = useState(false);
   const [turn, setTurn] = useState("human");
+  const [score, setScore] = useState({human : 0,  cpu:0});
 
   // place human ships
   let carrier = human.gameboard.place(Ship(1), ["E", 4], "h");
@@ -27,7 +28,12 @@ function App() {
   let s = cpu.gameboard.place(Ship(4), ["H", 9], "h");
   let p = cpu.gameboard.place(Ship(5), ["H", 2], "v");
 
-  //UI
+  //
+  const reset = () => {
+    setCpuBoard(cpu.gameboard);
+    setHumanBoard(human.gameboard);
+    setTurn('human');
+  }
 
   const changeTurn = () => {
     if (turn === "human") setTurn("cpu");
@@ -39,29 +45,39 @@ function App() {
   };
 
   const fire = (player, cell) => {
-    let attack =
-      player === human
-        ? human.attack(cpuBoard, cell)
-        : cpu.autoAttack(humanBoard);
+    //attack
+   let attack;
+      if (player === human){
+        attack = human.attack(cpuBoard, cell);
+         setCpuBoard(attack.board);
+      }else {
+        attack = cpu.autoAttack(humanBoard);
+        setHumanBoard(attack.board);
+      } ;
+ 
+    // show message
+   
     let who = player === human ? "We" : "ennemy";
-    let newBoard = attack.board;
-    let observation = attack.msg;
 
-    if (observation === "missed") setMsg(who + " missed !");
-    if (observation === "hit") setMsg(who + " hit !");
-    if (observation != "hit" && observation != "missed") {
-      setMsg(observation + " has been taken down !");
+    if (attack.msg === "missed") setMsg(who + " missed !");
+    if (attack.msg === "hit") setMsg(who + " hit !");
+    if (attack.msg != "hit" && attack.msg != "missed") {
+      setMsg(attack.msg + " has been taken down !");
     }
-    player === human ? setCpuBoard(newBoard) : setHumanBoard(newBoard);
-    if (newBoard.allSunk()) {
-      let outcome =
+    // Show overlay
+    setOverlay(true);
+
+    if (attack.board.allSunk()) {
+      setMsg(
         player === human
           ? "Victory ! Ennemy destroyed"
-          : "Defeat ! All our ships have been sunk...";
-      setMsg(outcome);
+          : "Defeat ! All our ships have been sunk..."
+      );
+      reset();
+    } else {
+      changeTurn();
     }
-    setOverlay(true);
-    changeTurn();
+
   };
 
   const handleRoger = () => {
