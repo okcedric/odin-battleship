@@ -1,108 +1,81 @@
 import "./App.css";
-import { Grid, MiniGrid } from "./dom";
+import { Grid, MiniGrid, Overlay } from "./dom";
 import Player from "./Player";
 import Ship from "./Ship";
+import { useState } from "react";
 
 function App() {
   const human = Player();
-  const humanBoard = human.gameboard;
   const cpu = Player();
-  const cpuBoard = cpu.gameboard;
-  const playing = "human";
+  const [humanBoard, setHumanBoard] = useState(human.gameboard);
+  const [cpuBoard, setCpuBoard] = useState(cpu.gameboard);
+  const [msg, setMsg] = useState("Player 1: Choose wisely");
+  const [overlay, setOverlay] = useState(false);
+  const [turn, setTurn] = useState("human");
 
   // place human ships
-  let carrier = humanBoard.place(Ship(1), ["E", 4], "h");
-  let battleship = humanBoard.place(Ship(2), ["A", 7], "h");
-  let destroyer = humanBoard.place(Ship(3), ["B", 2], "v");
-  let submarine = humanBoard.place(Ship(4), ["H", 9], "h");
-  let patrolBoat = humanBoard.place(Ship(5), ["H", 2], "v");
+  let carrier = human.gameboard.place(Ship(1), ["E", 4], "h");
+  let battleship = human.gameboard.place(Ship(2), ["A", 7], "h");
+  let destroyer = human.gameboard.place(Ship(3), ["B", 2], "v");
+  let submarine = human.gameboard.place(Ship(4), ["H", 9], "h");
+  let patrolBoat = human.gameboard.place(Ship(5), ["H", 2], "v");
 
   // place computer ship
-  let c = cpuBoard.place(Ship(1), ["E", 4], "h");
-  let b = cpuBoard.place(Ship(2), ["A", 7], "h");
-  let d = cpuBoard.place(Ship(3), ["B", 2], "v");
-  let s = cpuBoard.place(Ship(4), ["H", 9], "h");
-  let p = cpuBoard.place(Ship(5), ["H", 2], "v");
+  let c = cpu.gameboard.place(Ship(1), ["E", 4], "h");
+  let b = cpu.gameboard.place(Ship(2), ["A", 7], "h");
+  let d = cpu.gameboard.place(Ship(3), ["B", 2], "v");
+  let s = cpu.gameboard.place(Ship(4), ["H", 9], "h");
+  let p = cpu.gameboard.place(Ship(5), ["H", 2], "v");
 
   //UI
 
+  const changeTurn = () => {
+    if (turn === "human") setTurn("cpu");
+    if (turn === "cpu") setTurn("human");
+  };
+
   const handleClick = (cell) => {
-    const messageBoard = document.getElementById("msg");
-    let msg = human.attack(cpuBoard, cell);
-    let id = "opp-" + cell.toString();
+    fire(human, cell);
+  };
 
-    let cellDiv = document.getElementById(id);
+  const fire = (player, cell) => {
+    let attack =
+      player === human
+        ? human.attack(cpuBoard, cell)
+        : cpu.autoAttack(humanBoard);
+    let who = player === human ? "We" : "ennemy";
+    let newBoard = attack.board;
+    let observation = attack.msg;
 
-    if (msg != "hit" && msg != "missed") {
-      cellDiv.classList.add("hit");
-      msg += " have been sunk !";
-    } else {
-      cellDiv.classList.add(msg);
+    if (observation === "missed") setMsg(who + " missed !");
+    if (observation === "hit") setMsg(who + " hit !");
+    if (observation != "hit" && observation != "missed") {
+      setMsg(observation + " has been taken down !");
     }
-    messageBoard.innerHTML = msg;
+    player === human ? setCpuBoard(newBoard) : setHumanBoard(newBoard);
+    if (newBoard.allSunk()) {
+      let outcome =
+        player === human
+          ? "Victory ! Ennemy destroyed"
+          : "Defeat ! All our ships have been sunk...";
+      setMsg(outcome);
+    }
+    setOverlay(true);
+    changeTurn();
+  };
 
-    if (cpuBoard.allSunk()) {
-      msg = "Congrats ! You won !";
-      messageBoard.innerHTML = msg;
-    } else {
-      let ripost = cpu.autoAttack(humanBoard);
-      msg = ripost.msg;
-      messageBoard.innerHTML = msg;
-      console.info(ripost.cell);
+  const handleRoger = () => {
+    setOverlay(false);
+    if (turn == "cpu") {
+      fire(cpu);
     }
   };
 
   return (
     <>
-      <div className="left">
-        <div className="title">
-          <h1>Battleship</h1>
-          <p>This is a game of war!</p>
-        </div>
-        <div className="scoreBoard target">
-          <h2>Targets</h2>
-          <div className="score">
-            <h3 id="carrier">
-              Carrier(5) : <span>Afloat</span>
-            </h3>
-            <h3 id="battleship">
-              Battleship(4) : <span>Afloat</span>
-            </h3>
-            <h3 id="destroyer">
-              Destroyer(3) : <span>Afloat</span>
-            </h3>
-            <h3 id="submarine">
-              Submarine(3) : <span>Afloat</span>
-            </h3>
-            <h3 id="patrol">
-              Patrol Boat(2) : <span>Afloat</span>
-            </h3>
-          </div>
-        </div>
-      </div>
-      <Grid handleClick={handleClick}></Grid>
-      <div className="scoreBoard player">
-        <div className="title">
-        <MiniGrid />
-      </div>
-        <div className="score">
-          <h3 id="carrier">
-            Carrier(5) : <span>Afloat</span>
-          </h3>
-          <h3 id="battleship">
-            Battleship(4) : <span>Afloat</span>
-          </h3>
-          <h3 id="destroyer">
-            Destroyer(3) : <span>Afloat</span>
-          </h3>
-          <h3 id="submarine">
-            Submarine(3) : <span>Afloat</span>
-          </h3>
-          <h3 id="patrol">
-            Patrol Boat(2) : <span>Afloat</span>
-          </h3>
-        </div>
-      </div>
+      <Grid handleClick={handleClick} board={cpuBoard} msg={msg}></Grid>
+      <MiniGrid board={humanBoard} />
+      <Overlay overlay={overlay} msg={msg} handleRoger={handleRoger}></Overlay>
     </>
   );
 }

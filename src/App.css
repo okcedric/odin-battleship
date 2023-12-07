@@ -12,15 +12,27 @@
 .left{
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: start;
     gap:5rem
+}
+.overlay {
+    background-color: #1a1a1aCC;
+    backdrop-filter: blur(3px);
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
 }
 .scoreBoard{ 
     width: 25vw;
-    height: 100%;
+    height: fit-content;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
     align-items: left;
     gap:1rem;
     border : 2px dashed #576C4E;
@@ -31,9 +43,6 @@
 .scoreBoard span{
     text-transform: uppercase;
     color: #cbd1c5;
-}
-.scoreBoard.target {
-    justify-content: start;
 }
 
 .scoreBoard span.sunk {
@@ -54,7 +63,6 @@ h2{
     color: #cbd1c5;
     font-family: 'Tanker';
     font-size: 2.5rem;
-    padding-bottom: 1rem;
 }
 .cell {
     border: 2px solid #576C4E50;
@@ -73,22 +81,33 @@ h2{
 }
 
 .cell.hit, .cell.ocean {
-    background-color: #642216;
+    background-color: #162864;
     cursor: not-allowed;
 }
 .cell.hit:hover, .cell.ocean:hover, .cell.missed:hover{
     border-radius: 0;
 }
-.cell.missed, .cell.missed:hover{
+.cell.missed, .cell.missed:hover, .mini-cell.missed, .mini-cell.missed:hover{
     background-color: #cbd1c5;
+    cursor: not-allowed;
+}
+.mini-cell.hit, .mini-cell.ocean {
+    background-color: #642216;
     cursor: not-allowed;
 }
 .grid-wrapper {
     width: 100%;
     display: flex;
+    gap:2rem;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+
+}
+button {
+      color: #1a1a1a;
+     background-color: #cbd1c5;
+
 
 }
 .grid{
