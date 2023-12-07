@@ -6,15 +6,15 @@ test('player can attack the ennemy gameboard',() => {
     let playerOne = Player();
     let playerTwo = Player();
     let ennemyGameboard = playerTwo.gameboard;
-    expect(playerOne.attack(ennemyGameboard,["C",3])).toBeDefined();
+    expect(playerOne.attack(ennemyGameboard,["C",3]).msg).toBeDefined();
 })
 test("player can miss", () => {
   let playerOne = Player();
   let playerTwo = Player();
   let ennemyGameboard = playerTwo.gameboard;
   //place a battleship in player 2 gameboard
-  expect(playerOne.attack(ennemyGameboard, ["C", 4])).toBe("missed");
-  expect(playerOne.attack(ennemyGameboard, ["F", 3])).toBe("missed");
+  expect(playerOne.attack(ennemyGameboard, ["C", 4]).msg).toBe("missed");
+  expect(playerOne.attack(ennemyGameboard, ["F", 3]).msg).toBe("missed");
 });
 
 test ('player can hit ennemies ship', () => {
@@ -24,7 +24,7 @@ test ('player can hit ennemies ship', () => {
     let battleship = Ship(2);
     //place a battleship in player 2 gameboard
     battleship = ennemyGameboard.place(battleship,['D',3],"h");
-    expect(playerOne.attack(ennemyGameboard,['F',3])).toBe('hit');
+    expect(playerOne.attack(ennemyGameboard,['F',3]).msg).toBe('hit');
 })
 
 test ('player can sink ennemies ship', ()=>{
@@ -34,10 +34,10 @@ test ('player can sink ennemies ship', ()=>{
     let battleship = Ship(2);
     //place a battleship in player 2 gameboard
     battleship = ennemyGameboard.place(battleship, ["D", 3], "h");
-    expect(playerOne.attack(ennemyGameboard, ["D", 3])).toBe("hit");
-    expect(playerOne.attack(ennemyGameboard, ["E", 3])).toBe("hit");
-    expect(playerOne.attack(ennemyGameboard, ["F", 3])).toBe("hit");
-    expect(playerOne.attack(ennemyGameboard, ["G", 3])).toBe("Battleship");
+    expect(playerOne.attack(ennemyGameboard, ["D", 3]).msg).toBe("hit");
+    expect(playerOne.attack(ennemyGameboard, ["E", 3]).msg).toBe("hit");
+    expect(playerOne.attack(ennemyGameboard, ["F", 3]).msg).toBe("hit");
+    expect(playerOne.attack(ennemyGameboard, ["G", 3]).msg).toBe("Battleship");
 
 });
 

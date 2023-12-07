@@ -131,7 +131,7 @@ test("keep track of missed attacks", () => {
   gameboard.receiveAttack(["G", 4]);
   gameboard.receiveAttack(["A", 9]);
 
-  expect(gameboard.getMissed()).toEqual([["G",2],["A", 9]])
+  expect(gameboard.missed).toEqual([["G",2],["A", 9]])
 });
 
 test("reports whether or not all of their ships have been sunk",() => {

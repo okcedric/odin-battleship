@@ -12,13 +12,14 @@ const getPossibleTargets = (board) => {
 
     const attack = (board,cell) => {
         let msg = board.receiveAttack(cell);
-        return msg;
+
+        return { msg: msg, board: { ...board }, cell: cell };
     }
 
     const autoAttack = (board) => {
         let possibleTargets = getPossibleTargets(board);
         let newTarget = possibleTargets[getRandomInt(possibleTargets.length)];
-        return {cell: newTarget, msg:attack(board,newTarget)};
+        return attack(board,newTarget);
         }
 
     return {

@@ -8,13 +8,10 @@ import {
 
 export default function Gameboard() {
   let shipsAfloat = [];
-  let shipSunk = [];
   let occupiedCells = [];
   let missed = [];
   let hit = [];
-  const attackedLocations = () => {
-    return missed.concat(hit);
-  };
+
 
   const freeCells = (cells) => {
     occupiedCells = occupiedCells.filter(
@@ -83,8 +80,14 @@ export default function Gameboard() {
         if (isIn(cell, ship.coordinates)) {
           ship.hit();
           hit.push(cell);
-          msg = ship.isSunk() ? ship.getName(): "hit";
-          shipSunk.push()
+
+          if(ship.isSunk() ) {
+            msg = ship.getName();
+            
+          } else {
+              msg = 'hit';
+          }
+            
         } 
       });
    
@@ -96,17 +99,26 @@ export default function Gameboard() {
        return msg;
   };
 
-  const getMissed = () => {
-    return missed;
+  const attackedLocations = () => {
+    return missed.concat(hit);
   };
+
+  
   const allSunk = () => {
     return shipsAfloat.every((ship)=>ship.isSunk());
+  };
+
+  const sunk = () => {
+    let shipSunk = shipsAfloat.filter((ship) => ship.isSunk());
+    return shipSunk.map((ship) => ship.getName())
   };
   return {
     place,
     receiveAttack,
-    getMissed,
+    missed,
+    hit,
     allSunk,
     attackedLocations,
+    sunk
   };
 }
