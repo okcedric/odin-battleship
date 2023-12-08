@@ -1,6 +1,6 @@
 import "./App.css";
 import { Grid, MiniGrid, Overlay } from "./dom";
-import Player from "./Player";
+import Player from "./Player.js";
 import Ship from "./Ship";
 import { useState } from "react";
 

@@ -1,4 +1,3 @@
-import Ship from "./Ship";
 import {
   isARealCell,
   isIn,
