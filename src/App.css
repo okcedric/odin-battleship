@@ -1,25 +1,53 @@
 
 
 #root{
-      display:flex;
+    display:flex;
+    flex-direction: column;
     align-items: top;
-    gap:0rem;
+    gap:1rem;
     justify-content: space-between ;
     width: 100%;
     padding: 2rem ;
     min-height: 100vh;
 }
-.left{
+.title{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem
+}
+.title h2 {
+    font-family: 'JetBrains Mono', 'Courier New', Courier, monospace;
+    font-weight: 900;
+    color :#1a1a1a;
+    text-transform: uppercase;
+}
+
+.title .card {
+    background-color: #cbd1c5;
+    justify-content: center;
+    align-items: center;
+}
+
+main{
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    height: 100%;
+}
+.left,.center, .right{
     display: flex;
     flex-direction: column;
-    justify-content: start;
-    gap:5rem
+    justify-content: center;
+    align-items: center;
+    gap:2rem
 }
 .overlay {
     background-color: #1a1a1aCC;
     backdrop-filter: blur(3px);
     position: absolute;
     display: flex;
+    gap: 2rem;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -28,33 +56,35 @@
     width: 100vw;
     height: 100vh;
 }
-.scoreBoard{ 
-    width: 25vw;
-    height: fit-content;
+
+#msg {
+    font-family : 'Tanker';
+    font-size : 5vw;
+    color: #cbd1c5;
+
+}
+.card{ 
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
     align-items: left;
+    justify-content: space-between;
     gap:1rem;
     border : 2px dashed #576C4E;
     padding : 1rem;
     font-size: 1.27rem;
     border-radius: 1rem;
 }
-.scoreBoard span{
+.card span{
     text-transform: uppercase;
     color: #cbd1c5;
 }
 
-.scoreBoard span.sunk {
+.card span.sunk {
     color:#642216}
 
-#msg{
-    font-size: 3rem;
-    font-family: 'Tanker';
-    text-transform: capitalize;
-    padding : 2rem 0;
-    color: #cbd1c5;
-}
+
 h1{
     color: #cbd1c5;
     
@@ -62,7 +92,10 @@ h1{
 h2{
     color: #cbd1c5;
     font-family: 'Tanker';
-    font-size: 2.5rem;
+    font-size: 2rem;
+}
+h3 {
+    font-size: 1.27rem;
 }
 .cell {
     border: 2px solid #576C4E50;
@@ -95,15 +128,7 @@ h2{
     background-color: #642216;
     cursor: not-allowed;
 }
-.grid-wrapper {
-    width: 100%;
-    display: flex;
-    gap:2rem;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
 
-}
 button {
       color: #1a1a1a;
      background-color: #cbd1c5;

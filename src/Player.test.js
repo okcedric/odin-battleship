@@ -173,6 +173,5 @@ test("Computer come back to hunt mode after sinking", () => {
 
   //check if it's still shooting
   let fifthAttack = computer.autoAttack(humanBoard);
-  console.log({ fifthAttack: fifthAttack });
   expect(fifthAttack).toBeDefined();
 });
