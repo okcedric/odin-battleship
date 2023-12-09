@@ -10,6 +10,7 @@ export default function Gameboard() {
   let occupiedCells = [];
   let missed = [];
   let hit = [];
+  let sunk = [];
 
 
   const freeCells = (cells) => {
@@ -65,37 +66,41 @@ export default function Gameboard() {
   };
   
   const receiveAttack = (cell) => {
-
-    let msg='';
+    //check if cell is valid
+    let msg = "";
     if (!isARealCell(cell)) throw new Error("This cell does not exist");
-    
-    // record the location as attacked;
+
+    // check if cell has already been attacked
     if (isIn(cell, attackedLocations())) {
       throw new Error("This cell has already been attacked");
     }
-    //if cell is occupied find by which ship and hit him return hit or ocean if is sunk
+    //if cell is occupied 
     if (isOccupied(cell, occupiedCells)) {
+      //if a ship has this coordinate
       shipsAfloat.map((ship) => {
         if (isIn(cell, ship.coordinates)) {
+          //hit it and mark the cell as a hit
           ship.hit();
           hit.push(cell);
 
-          if(ship.isSunk() ) {
+          //afte that , if the ship is sunk
+          if (ship.isSunk()) {
+            //announce the ship as sunk and note it
             msg = ship.getName();
-            
+            sunk.push(cell);
           } else {
-              msg = 'hit';
+            //announce the cell as hit
+            msg = "hit";
           }
-            
-        } 
+        }
       });
-   
-      //else retunr missed
+
+      //else announce the cell as missed
     } else {
       missed.push(cell);
       msg = "missed";
     }
-       return msg;
+    return msg;
   };
 
   const attackedLocations = () => {
@@ -107,10 +112,12 @@ export default function Gameboard() {
     return shipsAfloat.every((ship)=>ship.isSunk());
   };
 
-  const sunk = () => {
+  const sunkShips = () => {
     let shipSunk = shipsAfloat.filter((ship) => ship.isSunk());
     return shipSunk.map((ship) => ship.getName())
   };
+
+ 
   return {
     place,
     receiveAttack,
@@ -118,6 +125,7 @@ export default function Gameboard() {
     hit,
     allSunk,
     attackedLocations,
-    sunk
+    sunk,
+    sunkShips,
   };
 }

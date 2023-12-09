@@ -156,22 +156,49 @@ test("Computer come back to hunt mode after sinking", () => {
   let human = Player();
   let computer = Player();
   let humanBoard = human.gameboard;
-  let submarine = Ship(4);
 
   // Placing a ship on the human board
+  let submarine = Ship(4);
   humanBoard.place(submarine, ["E", 5], "v"); // A 3-cell ship
 
   // Simulating hits on the ship
   humanBoard.receiveAttack(["E", 5]); // First hit
   humanBoard.receiveAttack(["E", 6]); // Second hit
-
+  
   // Computer performs automatic attacks
   let thirdAttack = computer.autoAttack(humanBoard);
   let fourthAttack = computer.autoAttack(humanBoard);
   // Check if submarine is sunk
-  expect(humanBoard.sunk()).toContainEqual("Submarine");
-
+  expect(humanBoard.sunkShips()).toContainEqual("Submarine");
+  
   //check if it's still shooting
   let fifthAttack = computer.autoAttack(humanBoard);
   expect(fifthAttack).toBeDefined();
 });
+
+
+test("Computer can handle hitting two different ships on a row",
+  () => {
+    // Setting up players and boards
+    let human = Player();
+    let computer = Player();
+    let humanBoard = human.gameboard;
+
+    // Placing two ships next to each other on the human board
+    let submarine = Ship(4);
+    let patrolBoat = Ship(5);
+    humanBoard.place(submarine, ["E", 5], "h"); // A 3-cell ship
+    humanBoard.place(patrolBoat, ["F", 6], "v"); // A 2-cell ship
+
+    //Simulating a hit on each ship
+    humanBoard.receiveAttack(["F", 4]); // Missed
+    humanBoard.receiveAttack(["F", 5]); // First hit on submarine
+    humanBoard.receiveAttack(["F", 6]); // Second hit on patrol Boat
+    expect(computer.autoAttack(humanBoard).cell).toEqual(["F", 7]); // sunking the patrolBoat
+    let expectedCells = [
+      ["E", 5],
+      ["G", 5],
+    ];
+    let fifthAttack = computer.autoAttack(humanBoard).cell;
+    expect(expectedCells).toContainEqual(fifthAttack);
+  });

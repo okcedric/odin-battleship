@@ -1,3 +1,16 @@
+function getRandomInt(max) {
+  return Math.floor(Math.random() * max);
+}
+const getShipSize = (name) => {
+  let size;
+  if (name === "Carrier") size = 5;
+  if (name === "Battleship") size = 4;
+  if (name === "Destroyer") size = 3;
+  if (name === "Submarine") size = 3;
+  if (name === "Patrol Boat") size = 2;
+  return size
+}
+
 const isARealCell = (array) => {
   return (
     typeof array == "object" &&
@@ -24,9 +37,6 @@ const isOccupied = (cell,occupiedCells) => {
 };
 
 
-function getRandomInt(max) {
-  return Math.floor(Math.random() * max);
-}
 
 const isValidDir = (dir) => {
   return dir === "v" || dir === "h";
@@ -43,4 +53,13 @@ numberArray.forEach((number) => {
 });
 
 
-export  {isARealCell,areMatching,isIn,isOccupied,isValidDir,getRandomInt, grid}
+export {
+  getRandomInt,
+  getShipSize,
+  isARealCell,
+  areMatching,
+  isIn,
+  isOccupied,
+  isValidDir,
+  grid,
+};

@@ -1,10 +1,11 @@
 import Gameboard from "./Gameboard";
-import { isIn, getRandomInt, grid, isARealCell } from "./helpers";
+import { isIn, getRandomInt, grid, isARealCell,  getShipSize, } from "./helpers";
 
 export default function Player() {
   let gameboard = Gameboard();
 
-  let toss = 0;
+  let toss = getRandomInt(2);
+  let sunkList = [];
 
   const getPossibleTargets = (board) => {
     let possibles = grid.filter(
@@ -15,8 +16,13 @@ export default function Player() {
 
   const attack = (board, cell) => {
     let msg = board.receiveAttack(cell);
-
-    return { msg: msg, board: { ...board }, cell: cell };
+    //if the attack sunk a ship;
+    if (isIn(cell,board.sunk)) {
+      sunkList.push(cell);
+      
+    }
+    let newBoard= {...board}
+    return { msg: msg, board: { ...newBoard }, cell: cell };
   };
 
   const blackOrWhite = grid.filter(
@@ -29,24 +35,14 @@ export default function Player() {
     let newTarget;
     let msg;
     //label cell hit but not sunk as clues
-    let clues = board.hit;
-    if (board.sunk().includes("Carrier")) clues = clues.slice(5);
-    if (board.sunk().includes("Battleship")) clues = clues.slice(4);
-    if (board.sunk().includes("Destroyer")) clues = clues.slice(3);
-    if (board.sunk().includes("Submarine")) clues = clues.slice(3);
-    if (board.sunk().includes("Patrol Boat")) clues = clues.slice(2);
+  
+    let clues = board.hit.filter((cell) => !isIn(cell, sunkList));
+
     const mode = clues.length;
 
     if (mode == 0) {
       //hunt
-      targets = blackOrWhite.filter(
-        (cell) => !isIn(cell, board.attackedLocations())
-      );
-      newTarget = targets[getRandomInt(targets.length)];
-      target = attack(board, newTarget);
-      msg = target.msg;
-
-      return { ...target };
+      targets = blackOrWhite;
     }
 
     if (mode == 1) {
@@ -60,18 +56,6 @@ export default function Player() {
       let left = [String.fromCharCode(letter.charCodeAt(0) - 1), number];
       let right = [String.fromCharCode(letter.charCodeAt(0) + 1), number];
       targets.push(top, bottom, left, right);
-
-      //Keep only cells that are in the grid
-      targets = targets.filter((cell) => isARealCell(cell));
-
-      //and that haven't been attacked yet
-      targets = targets.filter(
-        (cell) => !isIn(cell, board.attackedLocations())
-      );
-      newTarget = targets[getRandomInt(targets.length)];
-      target = attack(board, newTarget);
-
-      return { ...target };
     }
 
     if (mode >= 2) {
@@ -107,23 +91,38 @@ export default function Player() {
         : last[changingAxis] + 1;
 
       targets = [after, before];
-      //Keep only cells that are in the grid
-      targets = targets.filter((cell) => isARealCell(cell));
-
-      //and that haven't been attacked yet
-      targets = targets.filter(
-        (cell) => !isIn(cell, board.attackedLocations())
-      );
-      newTarget = targets[getRandomInt(targets.length)];
-      target = attack(board, newTarget);
-
-      return { ...target };
+      
     }
+    //Keep only cells that are in the grid
+    targets = targets.filter((cell) => isARealCell(cell));
+
+    //and that haven't been attacked yet
+    targets = targets.filter((cell) => !isIn(cell, board.attackedLocations()));
+    newTarget = targets[getRandomInt(targets.length)];
+    target = attack(board, newTarget);
+    
+    //if the attack sunk a ship;
+    if (isIn(target.cell,board.sunk)) {
+      let lastShipSunk = board.sunkShips().at(-1);
+      
+      // get the ship size 
+      let boatSize = getShipSize(lastShipSunk);
+      
+      //get last sunk cells
+      let newSunkCells = board.hit.slice(-boatSize);
+      newSunkCells.pop();// The last is already marked as sunk
+      //mark them as sunk
+      console.log({fire: target.cell})
+      sunkList = sunkList.concat(newSunkCells);
+    }
+    
+    return { ...target };
   };
 
   return {
     attack,
     autoAttack,
     gameboard,
+    toss,
   };
 }

@@ -25,7 +25,7 @@ function Card({ title, children }) {
 }
 
 function Fleet ({board}) {
-  let sunk = board.sunk();
+  let sunk = board.sunkShips();
   return (
     <div>
       <h3 id="carrier">
