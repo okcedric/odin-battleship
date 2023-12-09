@@ -34,7 +34,7 @@ function App() {
     setCpuBoard(cpu.gameboard);
     setHumanBoard(human.gameboard);
     setTurn("human");
-    setMsg("HUMAN : " + score.human + " CPU : " + score.cpu);
+    setMsg("HUMAN : " + score.human + " - CPU : " + score.cpu);
   };
 
   const changeTurn = () => {
@@ -59,7 +59,7 @@ function App() {
 
     // show message
 
-    let who = player === human ? "We" : "ennemy";
+    let who = player === human ? "Your missile" : "Enemy missile";
 
     if (attack.msg === "missed") setMsg(who + " missed !");
     if (attack.msg === "hit") setMsg(who + " hit !");
@@ -96,37 +96,37 @@ function App() {
 
   return (
     <>
-      <div className="title">
-        <div>
-        <h1>Battleship</h1>
-        <h3>This is a game of war!</h3>
-        </div>
-        <Card title={msg}></Card>
-      </div>
       <main>
         <div className="left">
-          <Card title="Score">
-            <div>
-              <h3>HUMAN: {score.human}</h3>
-              <h3>CPU: {score.cpu}</h3>
-            </div>
-          </Card>
-          <Card title="Targets">
-            <Fleet board={cpuBoard} />
+          <div className="title">
+            <h1>Battleship</h1>
+            <h3>This is a game of war!</h3>
+          </div>
+          <Card title="Your fleet">
+            <Fleet board={humanBoard}></Fleet>
+            <MiniGrid board={humanBoard} />
           </Card>
         </div>
         <div className="center">
+          <h2>{msg}</h2>
+          <div className="grid-wrapper">
           <Grid
             handleClick={handleClick}
             board={cpuBoard}
             msg={msg}
             score={score}
           ></Grid>
+          </div>
         </div>
         <div className="right">
-          <Card title="Your fleet">
-            <Fleet board={humanBoard}></Fleet>
-            <MiniGrid board={humanBoard} />
+           <Card title="Score">
+            <div className="score">
+              <h3>HUMAN: {score.human}</h3>
+              <h3>CPU: {score.cpu}</h3>
+            </div>
+          </Card>
+          <Card title="Targets">
+            <Fleet board={cpuBoard} />
           </Card>
         </div>
 

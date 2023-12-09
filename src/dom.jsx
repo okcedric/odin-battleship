@@ -27,7 +27,7 @@ function Card({ title, children }) {
 function Fleet ({board}) {
   let sunk = board.sunk();
   return (
-    <div className="score">
+    <div>
       <h3 id="carrier">
         Carrier(5) :
         {sunk.includes("Carrier") ? (
