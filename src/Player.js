@@ -15,14 +15,23 @@ export default function Player() {
   };
 
   const attack = (board, cell) => {
-    let msg = board.receiveAttack(cell);
-    //if the attack sunk a ship;
-    if (isIn(cell,board.sunk)) {
-      sunkList.push(cell);
-      
+    let attackResult = board.receiveAttack(cell); // attackResult = { message: string, sunkShipCoordinates: array | null }
+    
+    if (attackResult.sunkShipCoordinates) {
+      // Concatenate new sunk coordinates, ensuring no duplicates if necessary,
+      // though current logic for clues should handle it.
+      // For simplicity, direct concat, assuming sunkShipCoordinates are unique and not already in sunkList.
+      sunkList = sunkList.concat(attackResult.sunkShipCoordinates);
+      // A more robust way to avoid duplicates if sunkShipCoordinates could overlap or repeat:
+      // attackResult.sunkShipCoordinates.forEach(coord => {
+      //   if (!isIn(coord, sunkList)) {
+      //     sunkList.push(coord);
+      //   }
+      // });
     }
-    let newBoard= {...board}
-    return { msg: msg, board: { ...newBoard }, cell: cell };
+
+    let newBoard = { ...board }; // Preserve existing shallow copy behavior
+    return { ...attackResult, board: newBoard, cell: cell };
   };
 
   const blackOrWhite = grid.filter(
@@ -98,23 +107,39 @@ export default function Player() {
 
     //and that haven't been attacked yet
     targets = targets.filter((cell) => !isIn(cell, board.attackedLocations()));
-    newTarget = targets[getRandomInt(targets.length)];
-    target = attack(board, newTarget);
-    
-    //if the attack sunk a ship;
-    if (isIn(target.cell,board.sunk)) {
-      let lastShipSunk = board.sunkShips().at(-1);
-      
-      // get the ship size 
-      let boatSize = getShipSize(lastShipSunk);
-      
-      //get last sunk cells
-      let newSunkCells = board.hit.slice(-boatSize);
-      newSunkCells.pop();// The last is already marked as sunk
-      //mark them as sunk
-      console.log({fire: target.cell})
-      sunkList = sunkList.concat(newSunkCells);
+
+    if (targets.length === 0) {
+      // Fallback to hunt mode
+      let possibleCells = grid.filter(
+        (cell) => !isIn(cell, board.attackedLocations())
+      );
+      newTarget = possibleCells[getRandomInt(possibleCells.length)];
+    } else {
+      newTarget = targets[getRandomInt(targets.length)];
     }
+
+    if (newTarget === undefined) {
+      console.warn("AI has no valid moves left.");
+      return; 
+    }
+
+    target = attack(board, newTarget); // target is now { message, sunkShipCoordinates, board, cell }
+    
+    // The entire block below is removed as sunkList is now updated in the attack function
+    // based on sunkShipCoordinates from receiveAttack.
+    // if (isIn(target.cell,board.sunk)) {
+    //   let lastShipSunk = board.sunkShips().at(-1);
+    //   
+    //   // get the ship size 
+    //   let boatSize = getShipSize(lastShipSunk);
+    //   
+    //   //get last sunk cells
+    //   let newSunkCells = board.hit.slice(-boatSize);
+    //   newSunkCells.pop();// The last is already marked as sunk
+    //   //mark them as sunk
+    //   console.log({fire: target.cell})
+    //   sunkList = sunkList.concat(newSunkCells);
+    // }
     
     return { ...target };
   };

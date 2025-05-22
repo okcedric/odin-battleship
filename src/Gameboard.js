@@ -77,30 +77,35 @@ export default function Gameboard() {
     //if cell is occupied 
     if (isOccupied(cell, occupiedCells)) {
       //if a ship has this coordinate
-      shipsAfloat.map((ship) => {
+      for (const ship of shipsAfloat) {
         if (isIn(cell, ship.coordinates)) {
-          //hit it and mark the cell as a hit
           ship.hit();
           hit.push(cell);
 
-          //afte that , if the ship is sunk
           if (ship.isSunk()) {
-            //announce the ship as sunk and note it
             msg = ship.getName();
-            sunk.push(cell);
+            // sunk.push(cell); // This was for the old logic, can be removed or kept if specific cell of sinking is needed elsewhere.
+            // For now, the task implies sunkShipCoordinates is the source of truth for all cells of a sunk ship.
+            return { message: msg, sunkShipCoordinates: ship.coordinates };
           } else {
-            //announce the cell as hit
             msg = "hit";
+            return { message: msg, sunkShipCoordinates: null };
           }
         }
-      });
+      }
+      // This part should ideally not be reached if isOccupied(cell, occupiedCells) is true
+      // and the cell is indeed part of a ship. If it is reached, it implies an inconsistency.
+      // For safety, we can treat it as a miss, though it might mask deeper issues.
+      msg = "missed"; 
+      missed.push(cell);
+      return { message: msg, sunkShipCoordinates: null };
 
       //else announce the cell as missed
     } else {
       missed.push(cell);
       msg = "missed";
+      return { message: msg, sunkShipCoordinates: null };
     }
-    return msg;
   };
 
   const attackedLocations = () => {
