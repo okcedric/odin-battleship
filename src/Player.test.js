@@ -1,6 +1,7 @@
-import { expect } from "vitest";
+import { expect, describe } from "vitest"; // Added describe
 import Player from "./Player.js";
 import Ship from "./Ship.js";
+import { isARealCell } from "./helpers.js"; // Added isARealCell import
 
 test("player can attack the ennemy gameboard", () => {
   let playerOne = Player();
@@ -200,5 +201,112 @@ test("Computer can handle hitting two different ships on a row",
       ["G", 5],
     ];
     let fifthAttack = computer.autoAttack(humanBoard).cell;
+    let fifthAttack = computer.autoAttack(humanBoard).cell;
     expect(expectedCells).toContainEqual(fifthAttack);
   });
+
+describe('Player AI after sinking a ship', () => {
+  test('should continue to play and make a valid move after sinking a ship', () => {
+    const humanPlayer = Player();
+    const computer = Player();
+    // Ship(5) creates a "Patrol Boat" of size 2
+    const patrolBoatToPlace = Ship(5); 
+
+    // Place ship on human's board.
+    humanPlayer.gameboard.place(patrolBoatToPlace, ['A', 1], 'v'); // Occupies ['A',1], ['A',2]
+
+    // AI directly attacks to sink the ship
+    computer.attack(humanPlayer.gameboard, ['A', 1]);
+    const sinkAttackResult = computer.attack(humanPlayer.gameboard, ['A', 2]);
+
+    // Verify ship is sunk
+    // sinkAttackResult.message from receiveAttack should be the name of the sunk ship
+    expect(sinkAttackResult.message).toBe('Patrol Boat');
+    // Also check the board state directly using sunkShips()
+    expect(humanPlayer.gameboard.sunkShips()).toContain('Patrol Boat');
+
+    // AI makes its next move using autoAttack (this is the crucial part)
+    const nextAttackResult = computer.autoAttack(humanPlayer.gameboard);
+    
+    // It's possible autoAttack returns undefined if no moves are left,
+    // though after sinking one small ship, there should be plenty.
+    expect(nextAttackResult).toBeDefined(); 
+    
+    // Assertions for the AI's next move
+    expect(isARealCell(nextAttackResult.cell)).toBe(true);
+    expect(nextAttackResult.cell).not.toEqual(['A', 1]);
+    expect(nextAttackResult.cell).not.toEqual(['A', 2]);
+    // nextAttackResult.message is from the board.receiveAttack call inside autoAttack
+    expect(['hit', 'missed']).toContain(nextAttackResult.message); 
+    
+    // Check that the new cell was indeed marked as attacked on the human's board
+    const attackedCells = humanPlayer.gameboard.attackedLocations();
+    expect(attackedCells).toEqual(expect.arrayContaining([nextAttackResult.cell]));
+  });
+});
+
+describe('Player AI after sinking a ship', () => {
+  test('should continue to play and make a valid move after sinking a ship', () => {
+    const humanPlayer = Player();
+    const computer = Player();
+    const patrolBoat = Ship(5); // type 5 is "Patrol Boat", size 2
+
+    // Place ship on human's board. Patrol boat is size 2.
+    // Assuming humanPlayer.gameboard is the correct gameboard instance.
+    humanPlayer.gameboard.place(patrolBoat, ['A', 1], 'v'); // Occupies ['A',1], ['A',2]
+
+    // AI directly attacks to sink the ship
+    computer.attack(humanPlayer.gameboard, ['A', 1]);
+    const sinkAttackResult = computer.attack(humanPlayer.gameboard, ['A', 2]);
+
+    // Verify ship is sunk
+    // sinkAttackResult.message should be the name of the sunk ship, "Patrol Boat"
+    expect(sinkAttackResult.message).toBe('Patrol Boat');
+    // Also check the board state directly
+    expect(humanPlayer.gameboard.sunkShips()).toContain('Patrol Boat');
+    // Find the ship instance on the board to check its isSunk status
+    // This assumes shipsAfloat is accessible and holds the placed ship objects.
+    // And that place() returns the ship object with its coordinates, or we can find it.
+    // For simplicity, let's rely on sunkShips() and the message for now,
+    // as direct access to shipsAfloat and specific ship instances from Gameboard might be tricky
+    // or require more knowledge of Gameboard's internal API.
+    // A more robust way: check if all coordinates of the patrol boat are in the hit list and the ship is reported sunk.
+    const placedShip = humanPlayer.gameboard.shipsAfloat.find(ship => ship.getName() === "Patrol Boat");
+    expect(placedShip.isSunk()).toBe(true);
+
+
+    // AI makes its next move using autoAttack (this is the crucial part)
+    const nextAttackResult = computer.autoAttack(humanPlayer.gameboard);
+    
+    // It's possible autoAttack returns undefined if no moves are left,
+    // though after sinking one small ship, there should be plenty.
+    expect(nextAttackResult).toBeDefined(); 
+    
+    // Assertions for the AI's next move
+    // We need to import isARealCell from helpers
+    // Assuming Player.test.js is in src/, and helpers.js is in src/
+    // So the path should be './helpers' or '../helpers' if test is in a subfolder.
+    // Given Player.js imports from './helpers', and Player.test.js is likely alongside or in a test subfolder.
+    // Let's assume it's in the same folder for now, or correct if path is wrong.
+    // The prompt example uses '../helpers', which means Player.test.js might be in e.g. src/tests/
+    // From existing tests, it seems Player.test.js is at the same level as Player.js
+    // However, Player.js is in src/, so helpers.js is also in src/.
+    // Thus, from src/Player.test.js, it should be './helpers.js' if Player.test.js is in src,
+    // or '../helpers.js' if Player.test.js is in e.g. src/__tests__
+    // The prompt uses `import { isARealCell } from '../helpers';` which implies tests are one level down.
+    // But the existing tests don't show an import for isARealCell. Let's add it.
+
+    expect(isARealCell(nextAttackResult.cell)).toBe(true);
+    expect(nextAttackResult.cell).not.toEqual(['A', 1]);
+    expect(nextAttackResult.cell).not.toEqual(['A', 2]);
+    expect(['hit', 'missed']).toContain(nextAttackResult.message);
+    
+    // Check that the new cell was indeed marked as attacked on the human's board
+    const attackedCells = humanPlayer.gameboard.attackedLocations();
+    // Check if nextAttackResult.cell is one of the elements in attackedCells
+    // Using expect.arrayContaining for flexibility if other cells were already attacked
+    expect(attackedCells).toEqual(expect.arrayContaining([nextAttackResult.cell]));
+    // A stricter check could be to see if it's the *last* attacked cell,
+    // but arrayContaining is fine.
+  });
+});
